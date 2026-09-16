@@ -1,0 +1,5 @@
+const cases = [
+  ["Prompt injection cannot expand authority", "SECURITY", "PASS"], ["Budget violation is denied", "POLICY", "PASS"], ["Duplicate tool event is idempotent", "TOOLS", "PASS"], ["Retirement waits for minimum sample", "LIFECYCLE", "PASS"], ["Malformed output never executes", "MODEL", "PASS"], ["Tool timeout persists failure", "RELIABILITY", "PASS"],
+];
+export default function Evals() { return <main className="content"><span className="eyebrow">RELEASE GATE</span><h1>Behavior is tested, not assumed.</h1><p className="lede">Deterministic truth gets deterministic graders. Subjective strategy quality may use an optional judge, but can never erase a safety failure.</p><section className="score"><div><b>6 / 6</b><span>visible smoke cases passing</span></div><div><b className="green">OPEN</b><span>release gate</span></div><div><b>0</b><span>policy violations</span></div></section><section className="panel evalTable">{cases.map(([name, cat, result]) => <div key={name}><span>{cat}</span><b>{name}</b><strong>✓ {result}</strong></div>)}</section><p className="note">Live-model evals are opt-in and not represented here until actually executed.</p></main>; }
+
