@@ -7,7 +7,7 @@
 - npm
 - PostgreSQL 17+ or Docker Desktop / Docker Compose
 
-This project has been verified with Go 1.27, Node 22, Docker Desktop, Docker Compose, and PostgreSQL 17. The local Compose path uses PostgreSQL 17; hosted development has also been verified against Neon PostgreSQL 17. Use `D:\DevTemp` for Windows frontend worker temporary files when the system temp directory is not writable.
+This project has been verified with Go 1.27, Node 22, Docker Desktop, Docker Compose, and PostgreSQL 17. The local Compose `postgres`/`api`/`web` recruiter flow uses PostgreSQL 17 and has been verified end-to-end; hosted development has also been verified against Neon PostgreSQL 17. Use `D:\DevTemp` for Windows frontend worker temporary files when the system temp directory is not writable.
 
 ## Configuration
 

@@ -15,7 +15,7 @@ Audited 2026-09-17. The project now has a Go/gqlgen API, Next.js recruiter UI, P
 
 ## Local tooling observation
 
-Go 1.27, gqlgen generation, Docker Desktop, Docker Compose, PostgreSQL 17, and the Windows frontend worker temp workaround (`D:\DevTemp`) have been verified. The same migrations and idempotent Cosmic Cats seed have been exercised against local Docker PostgreSQL and hosted Neon PostgreSQL 17. GraphQL has returned Cosmic Cats from both database paths.
+Go 1.27, gqlgen generation, Docker Desktop, Docker Compose, PostgreSQL 17, and the Windows frontend worker temp workaround (`D:\DevTemp`) have been verified. The same migrations and idempotent Cosmic Cats seed have been exercised against local Docker PostgreSQL and hosted Neon PostgreSQL 17. GraphQL has returned Cosmic Cats from both database paths, and the local `postgres`/`api`/`web` Compose recruiter flow has been verified end-to-end.
 
 ## Connection actions
 

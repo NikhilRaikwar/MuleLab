@@ -36,12 +36,14 @@ Cosmic Cats is a fictional, seeded commerce business. All outcomes below are sim
 | --- | --- |
 | Metric | Cost per qualified subscriber |
 | Required | `<= $1.50` |
-| Observed | `$5.00` |
+| Observed | `$5.00` in the documented seed-1337 verification |
 | Sample | `160` |
 | Deterministic stop threshold | `>= $3.00` |
 | Decision | `RETIRED` |
 | Decision authority | Deterministic lifecycle policy |
 | LLM authority | None |
+
+The recruiter route uses its own fixed seed (`424242`) and displays its measured result; the Compose verification retired Give at `$4.17`, still above the same deterministic `$3.00` stop threshold and with the required evidence sample.
 
 ## Trust boundary
 
@@ -125,7 +127,7 @@ MuleLab persists run and trace IDs, structured proposals, policy results, approv
 | Persisted 11-case eval suite | Verified |
 | DB-backed `latestEvalReport` and `/evals` | Verified |
 | GitHub Actions CI | Verified |
-| Full Docker Compose recruiter E2E | In progress |
+| Full Docker Compose recruiter E2E | Verified |
 | GCP deployment | Pending — not deployed |
 
 ## Tech stack
@@ -142,7 +144,7 @@ MuleLab persists run and trace IDs, structured proposals, policy results, approv
 
 ## Quick start
 
-The repository includes this Docker Compose startup path. The individual Docker PostgreSQL path is verified; the full web/API Compose recruiter flow is still marked in progress because the local Docker CLI became unresponsive during the latest E2E attempt.
+The full web/API/PostgreSQL Compose recruiter flow is verified. The local stack runs against its own PostgreSQL volume; hosted Neon remains a separately verified development path.
 
 ```powershell
 git clone git@github.com:NikhilRaikwar/MuleLab.git
