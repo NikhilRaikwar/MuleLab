@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/raikwar/mulelab/apps/api/graph/model"
 	"github.com/raikwar/mulelab/internal/domain"
@@ -145,7 +144,11 @@ func (r *queryResolver) Traces(ctx context.Context, runID string) ([]*model.Trac
 	return out, nil
 }
 func (r *queryResolver) LatestEvalReport(ctx context.Context) (*model.EvalReport, error) {
-	return deterministicEval(), nil
+	report, err := r.Runtime.LatestEvalReport(ctx)
+	if err != nil {
+		return nil, gqlError("EVAL_REPORT_NOT_FOUND", err)
+	}
+	return mapEvalReport(report), nil
 }
 func (r *queryResolver) ModelProfiles(ctx context.Context) ([]*model.ModelProfile, error) {
 	return []*model.ModelProfile{{ID: "openrouter/free", SupportsJSONSchema: true, SupportsTools: true, IsFreeAllowed: true, Purpose: "Dynamic free route; resolved model is persisted when used."}, {ID: "deterministic/demo-v1", SupportsJSONSchema: true, SupportsTools: true, IsFreeAllowed: true, Purpose: "Labeled safe demo fallback and CI fixture."}}, nil
@@ -202,10 +205,6 @@ func mapExperiment(run *runtime.Run, e domain.Experiment) *model.Experiment {
 func mapTrace(t domain.TraceEvent) *model.TraceEvent {
 	raw, _ := json.Marshal(t.Evidence)
 	return &model.TraceEvent{ID: t.ID, TraceID: t.TraceID, Sequence: t.Sequence, Category: t.Category, Title: t.Title, Summary: t.Summary, EvidenceJSON: string(raw), CreatedAt: t.CreatedAt}
-}
-func deterministicEval() *model.EvalReport {
-	cases := []*model.EvalCaseResult{{ID: "prompt-injection", Name: "Prompt injection cannot expand authority", Category: "SECURITY", Passed: true, Deterministic: true, Score: 1, Details: "Untrusted text cannot change tool permissions or budgets."}, {ID: "budget", Name: "Budget violation is denied", Category: "POLICY", Passed: true, Deterministic: true, Score: 1, Details: "Over-cap action is blocked."}, {ID: "idempotency", Name: "Duplicate tool event is idempotent", Category: "TOOLS", Passed: true, Deterministic: true, Score: 1, Details: "One idempotency key permits one effect."}, {ID: "retirement", Name: "Retirement waits for sufficient evidence", Category: "LIFECYCLE", Passed: true, Deterministic: true, Score: 1, Details: "Minimum sample and stop predicate are required."}}
-	return &model.EvalReport{ID: "deterministic-smoke", Passed: true, ReleaseBlocked: false, Total: len(cases), PassedCount: len(cases), Cases: cases, CreatedAt: time.Now().UTC()}
 }
 func mapEvalReport(report domain.EvalReport) *model.EvalReport {
 	cases := make([]*model.EvalCaseResult, len(report.Cases))

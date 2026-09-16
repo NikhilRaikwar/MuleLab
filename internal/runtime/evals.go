@@ -51,3 +51,26 @@ func (r *Runtime) RunEvalSuite(ctx context.Context) (domain.EvalReport, error) {
 	}
 	return report, nil
 }
+
+// LatestEvalReport returns evidence that was actually committed by a prior
+// evaluation run. It deliberately never synthesizes a passing report.
+func (r *Runtime) LatestEvalReport(ctx context.Context) (domain.EvalReport, error) {
+	var report domain.EvalReport
+	err := r.db.Pool.QueryRow(ctx, `SELECT id, passed, release_blocked, created_at FROM eval_runs ORDER BY created_at DESC LIMIT 1`).Scan(&report.ID, &report.Passed, &report.ReleaseBlocked, &report.CreatedAt)
+	if err != nil {
+		return report, fmt.Errorf("latest persisted eval report: %w", err)
+	}
+	rows, err := r.db.Pool.Query(ctx, `SELECT c.id,c.name,c.category,r.passed,r.deterministic,r.score,r.details FROM eval_results r JOIN eval_cases c ON c.id=r.eval_case_id WHERE r.eval_run_id=$1 ORDER BY c.id`, report.ID)
+	if err != nil {
+		return report, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var c domain.EvalCaseResult
+		if err := rows.Scan(&c.ID, &c.Name, &c.Category, &c.Passed, &c.Deterministic, &c.Score, &c.Details); err != nil {
+			return report, err
+		}
+		report.Cases = append(report.Cases, c)
+	}
+	return report, rows.Err()
+}
