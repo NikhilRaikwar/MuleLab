@@ -1,0 +1,216 @@
+scalar Time
+
+enum AgentStatus {
+  PROPOSED
+  POLICY_CHECKED
+  AWAITING_APPROVAL
+  APPROVED
+  RUNNING
+  EVALUATING
+  WINNING
+  LOSING
+  PAUSED
+  RETIRED
+  FAILED
+}
+
+enum AgentType { SUPERVISOR STORE NOTIFY GIVE }
+enum DecisionAction { KEEP PAUSE RETIRE REQUEST_MORE_DATA }
+
+type BusinessMetrics {
+  orders: Int!
+  conversionRate: Float!
+  repeatPurchaseRate: Float!
+  subscribers: Int!
+  qualifiedSubscribers: Int!
+  experimentSpendUsd: Float!
+}
+
+type Business {
+  id: ID!
+  name: String!
+  description: String!
+  seed: Int!
+  metrics: BusinessMetrics!
+  activeRun: AgentRun
+}
+
+type Objective {
+  id: ID!
+  kind: String!
+  description: String!
+  targetValue: Float!
+  budgetUsd: Float!
+}
+
+type AgentInstance {
+  id: ID!
+  type: AgentType!
+  name: String!
+  status: AgentStatus!
+  currentTask: String!
+  cumulativeImpact: String!
+  policyViolations: Int!
+}
+
+type ExperimentProposal {
+  id: ID!
+  version: Int!
+  agentType: AgentType!
+  hypothesis: String!
+  toolName: String!
+  toolArgumentsJson: String!
+  primaryMetric: String!
+  expectedOutcome: String!
+  budgetUsd: Float!
+  successThreshold: String!
+  stopCondition: String!
+  evidenceIds: [String!]!
+  confidence: Float!
+  status: AgentStatus!
+  requiresApproval: Boolean!
+  policyReasons: [String!]!
+}
+
+type ExperimentResult {
+  primaryMetric: String!
+  baseline: Float!
+  observed: Float!
+  sampleSize: Int!
+  spendUsd: Float!
+  successful: Boolean!
+  stopConditionMet: Boolean!
+  summary: String!
+}
+
+type Experiment {
+  id: ID!
+  proposal: ExperimentProposal!
+  status: AgentStatus!
+  approvedAt: Time
+  result: ExperimentResult
+}
+
+type TraceEvent {
+  id: ID!
+  traceId: ID!
+  sequence: Int!
+  category: String!
+  title: String!
+  summary: String!
+  evidenceJson: String!
+  createdAt: Time!
+}
+
+type ModelRunStats {
+  requestedModel: String!
+  resolvedModel: String!
+  source: String!
+  latencyMs: Int!
+  promptTokens: Int!
+  completionTokens: Int!
+  estimatedCostUsd: Float!
+  retries: Int!
+  structuredOutputValid: Boolean!
+}
+
+type AgentRun {
+  id: ID!
+  traceId: ID!
+  businessId: ID!
+  objective: Objective!
+  status: AgentStatus!
+  day: Int!
+  seed: Int!
+  agents: [AgentInstance!]!
+  proposals: [ExperimentProposal!]!
+  experiments: [Experiment!]!
+  modelStats: [ModelRunStats!]!
+  metrics: BusinessMetrics!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type EvalCaseResult {
+  id: ID!
+  name: String!
+  category: String!
+  passed: Boolean!
+  deterministic: Boolean!
+  score: Float!
+  details: String!
+}
+
+type EvalReport {
+  id: ID!
+  passed: Boolean!
+  releaseBlocked: Boolean!
+  total: Int!
+  passedCount: Int!
+  cases: [EvalCaseResult!]!
+  createdAt: Time!
+}
+
+type ModelProfile {
+  id: ID!
+  supportsJsonSchema: Boolean!
+  supportsTools: Boolean!
+  isFreeAllowed: Boolean!
+  purpose: String!
+}
+
+type ModelComparison {
+  modelId: String!
+  executed: Boolean!
+  source: String!
+  score: Float
+  policyViolations: Int
+  toolCallSuccessRate: Float
+  structuredOutputFailures: Int
+  latencyMs: Int
+  totalTokens: Int
+  estimatedCostUsd: Float
+  retries: Int
+  note: String!
+}
+
+input CreateRunInput {
+  businessId: ID!
+  objectiveKind: String!
+  targetValue: Float = 50
+  budgetUsd: Float = 100
+  seed: Int
+  liveModel: Boolean = false
+}
+
+input ReplayInput {
+  runId: ID!
+  modelIds: [String!]!
+}
+
+type ReplayResult {
+  scenarioSeed: Int!
+  comparisons: [ModelComparison!]!
+}
+
+type Query {
+  health: String!
+  demoBusinesses: [Business!]!
+  business(id: ID!): Business
+  run(id: ID!): AgentRun
+  traces(runId: ID!): [TraceEvent!]!
+  latestEvalReport: EvalReport!
+  modelProfiles: [ModelProfile!]!
+}
+
+type Mutation {
+  createRun(input: CreateRunInput!): AgentRun!
+  generateProposals(runId: ID!): [ExperimentProposal!]!
+  approveExperiment(id: ID!): Experiment!
+  rejectExperiment(id: ID!): Experiment!
+  advanceSimulation(runId: ID!, days: Int!): AgentRun!
+  evaluateRun(runId: ID!): AgentRun!
+  runEvalSuite: EvalReport!
+  replayScenario(input: ReplayInput!): ReplayResult!
+}
+
