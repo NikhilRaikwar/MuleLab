@@ -114,6 +114,19 @@ type TraceEvent struct {
 	CreatedAt time.Time      `json:"createdAt"`
 }
 
+type EvalCaseResult struct {
+	ID, Name, Category, Details string
+	Passed, Deterministic       bool
+	Score                       float64
+}
+
+type EvalReport struct {
+	ID                     string
+	Passed, ReleaseBlocked bool
+	Cases                  []EvalCaseResult
+	CreatedAt              time.Time
+}
+
 func CosmicCats() Business {
 	return Business{ID: "cosmic-cats", Name: "Cosmic Cats", Description: "A fictional creator store with conversion and retention opportunities.", Seed: 424242, Metrics: Metrics{Orders: 53, ConversionRate: .017, RepeatPurchaseRate: .09, Subscribers: 420}}
 }

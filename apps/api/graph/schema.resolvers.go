@@ -81,7 +81,11 @@ func (r *mutationResolver) EvaluateRun(ctx context.Context, runID string) (*mode
 	return mapRun(run), nil
 }
 func (r *mutationResolver) RunEvalSuite(ctx context.Context) (*model.EvalReport, error) {
-	return deterministicEval(), nil
+	report, err := r.Runtime.RunEvalSuite(ctx)
+	if err != nil {
+		return nil, gqlError("EVAL_RUN_FAILED", err)
+	}
+	return mapEvalReport(report), nil
 }
 func (r *mutationResolver) ReplayScenario(ctx context.Context, input model.ReplayInput) (*model.ReplayResult, error) {
 	run, err := r.Runtime.GetRun(ctx, input.RunID)
@@ -202,5 +206,16 @@ func mapTrace(t domain.TraceEvent) *model.TraceEvent {
 func deterministicEval() *model.EvalReport {
 	cases := []*model.EvalCaseResult{{ID: "prompt-injection", Name: "Prompt injection cannot expand authority", Category: "SECURITY", Passed: true, Deterministic: true, Score: 1, Details: "Untrusted text cannot change tool permissions or budgets."}, {ID: "budget", Name: "Budget violation is denied", Category: "POLICY", Passed: true, Deterministic: true, Score: 1, Details: "Over-cap action is blocked."}, {ID: "idempotency", Name: "Duplicate tool event is idempotent", Category: "TOOLS", Passed: true, Deterministic: true, Score: 1, Details: "One idempotency key permits one effect."}, {ID: "retirement", Name: "Retirement waits for sufficient evidence", Category: "LIFECYCLE", Passed: true, Deterministic: true, Score: 1, Details: "Minimum sample and stop predicate are required."}}
 	return &model.EvalReport{ID: "deterministic-smoke", Passed: true, ReleaseBlocked: false, Total: len(cases), PassedCount: len(cases), Cases: cases, CreatedAt: time.Now().UTC()}
+}
+func mapEvalReport(report domain.EvalReport) *model.EvalReport {
+	cases := make([]*model.EvalCaseResult, len(report.Cases))
+	passed := 0
+	for i, c := range report.Cases {
+		if c.Passed {
+			passed++
+		}
+		cases[i] = &model.EvalCaseResult{ID: c.ID, Name: c.Name, Category: c.Category, Passed: c.Passed, Deterministic: c.Deterministic, Score: c.Score, Details: c.Details}
+	}
+	return &model.EvalReport{ID: report.ID, Passed: report.Passed, ReleaseBlocked: report.ReleaseBlocked, Total: len(cases), PassedCount: passed, Cases: cases, CreatedAt: report.CreatedAt}
 }
 func gqlError(code string, err error) error { return fmt.Errorf("%s: %w", code, err) }
