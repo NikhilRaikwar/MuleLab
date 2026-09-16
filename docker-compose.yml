@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: mulelab
+      POSTGRES_USER: mulelab
+      POSTGRES_PASSWORD: mulelab
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mulelab -d mulelab"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - mulelab_pg:/var/lib/postgresql/data
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      PORT: "8080"
+      DATABASE_URL: postgresql://mulelab:mulelab@postgres:5432/mulelab?sslmode=disable
+      CORS_ALLOWED_ORIGINS: http://localhost:3000
+      ZERO_COST_MODE: "true"
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-openrouter/free}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+    ports: ["8080:8080"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_GRAPHQL_URL: http://localhost:8080/graphql
+    environment:
+      PORT: "8080"
+      NEXT_PUBLIC_GRAPHQL_URL: http://localhost:8080/graphql
+    ports: ["3000:8080"]
+    depends_on:
+      api:
+        condition: service_started
+volumes:
+  mulelab_pg:
