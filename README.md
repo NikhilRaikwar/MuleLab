@@ -142,7 +142,7 @@ MuleLab persists run and trace IDs, structured proposals, policy results, approv
 
 ## Quick start
 
-Docker Compose is the preferred local path once the stack has been built locally:
+The repository includes this Docker Compose startup path. The individual Docker PostgreSQL path is verified; the full web/API Compose recruiter flow is still marked in progress because the local Docker CLI became unresponsive during the latest E2E attempt.
 
 ```powershell
 git clone git@github.com:NikhilRaikwar/MuleLab.git
@@ -151,7 +151,7 @@ Copy-Item .env.example .env
 docker compose up --build
 ```
 
-The API starts with a local Postgres database, applies migrations, and seeds Cosmic Cats. Open `http://localhost:3000`; GraphQL is at `http://localhost:8080/graphql`.
+When the local Docker engine is responsive, the API starts with a local Postgres database, applies migrations, and seeds Cosmic Cats. Open `http://localhost:3000`; GraphQL is at `http://localhost:8080/graphql`.
 
 `OPENROUTER_API_KEY` is optional for deterministic demo mode and required only for live model mode. Put secrets only in local `.env`; never commit them. For native development and Neon configuration, see [setup](docs/SETUP.md).
 
