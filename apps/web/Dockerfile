@@ -14,7 +14,6 @@ WORKDIR /app
 ENV NODE_ENV=production PORT=8080 HOSTNAME=0.0.0.0
 COPY --from=build /app/.next-build/standalone ./
 COPY --from=build /app/.next-build/static ./.next-build/static
-COPY --from=build /app/public ./public
 USER node
 EXPOSE 8080
 CMD ["node", "server.js"]
