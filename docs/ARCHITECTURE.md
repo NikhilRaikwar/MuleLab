@@ -4,8 +4,8 @@
 
 ```mermaid
 flowchart LR
-  R[Recruiter browser] -->|GraphQL| W[Next.js web on Cloud Run]
-  W -->|server-side/public GraphQL| A[Go API on Cloud Run]
+  R[Recruiter browser] -->|GraphQL| W[Next.js web]
+  W -->|server-side/public GraphQL| A[Go API]
   A --> O[Bounded agent orchestrator]
   O --> M[Provider-neutral model gateway]
   M --> OR[OpenRouter free route]
@@ -60,9 +60,9 @@ Golden cases run through deterministic graders. An optional LLM judge handles on
 
 Product-level events persist inputs by reference, structured proposals, policy results, approval records, tool calls/results, transitions, metrics, retries, fallbacks, latency, token counts, and cost. Hidden chain-of-thought is never requested or displayed. OpenTelemetry spans are optional exports, not the recruiter-facing source of truth.
 
-### Deployment
+### Deployment target
 
-API and web are separate scale-to-zero Cloud Run services with maximum one instance each. Neon provides PostgreSQL. Artifact Registry stores the two images. There is no Cloud SQL, VPC connector, Pub/Sub, Kubernetes, or always-on worker.
+API and web are planned as separate scale-to-zero Cloud Run services with maximum one instance each. Neon provides PostgreSQL. Artifact Registry would store the two images. There is no Cloud SQL, VPC connector, Pub/Sub, Kubernetes, or always-on worker. GCP has not been provisioned or deployed.
 
 ## AI authority boundaries
 
@@ -167,4 +167,3 @@ The PRD requested Go 1.25+, gqlgen, pgx, Neon, Next.js, OpenRouter, Cloud Run, D
 - OpenTelemetry: traces and metrics are stable; logs remain structured stdout rather than depending on the pre-stable OTel log signal.
 - Cloud Run: minimum instances default to 0; explicitly set min 0/max 1. Artifact Registry repositories must exist before push and Docker/gcloud authentication is required.
 - GitHub Actions: use official setup actions and fixture-backed tests; live models are manual only.
-

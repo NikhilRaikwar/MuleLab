@@ -22,7 +22,7 @@ Use `pgx/v5`, SQL migrations, and explicit repositories. The domain stays testab
 
 ## Local and hosted database parity
 
-The same SQL migration runner and idempotent Cosmic Cats seed execute against PostgreSQL 17 in Docker and are intended for Neon through its direct, non-pooled migration URL. The runtime uses the pooled URL. The local Docker path is verified; hosted Neon creation is currently blocked by the account's Vercel-managed organization policy, not by the application.
+The same SQL migration runner and idempotent Cosmic Cats seed execute against PostgreSQL 17 in Docker and Neon through its direct, non-pooled migration URL. The runtime uses the pooled URL. Both local Docker and hosted Neon paths are verified. Credentials remain only in ignored local environment files.
 
 ## ADR-006: Current stable Go
 

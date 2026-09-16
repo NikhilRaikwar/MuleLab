@@ -5,9 +5,9 @@
 - Go 1.27.x
 - Node.js 20.9+ (Node 22 LTS is suitable)
 - npm
-- PostgreSQL 16+ or Docker
+- PostgreSQL 17+ or Docker Desktop / Docker Compose
 
-This host currently has Node 22.17.0, npm 10.9.2, Git 2.50.1, and Go 1.27.0. Backend tests and frontend lint/typecheck/production build have passed. Docker Desktop is not yet available to this shell, so container verification requires either restarting the shell after Docker installation or correcting Docker's PATH/service state.
+This project has been verified with Go 1.27, Node 22, Docker Desktop, Docker Compose, and PostgreSQL 17. The local Compose path uses PostgreSQL 17; hosted development has also been verified against Neon PostgreSQL 17. Use `D:\DevTemp` for Windows frontend worker temporary files when the system temp directory is not writable.
 
 ## Configuration
 
@@ -26,14 +26,14 @@ The deterministic demo does not require an OpenRouter key. Live AI does.
 - Format: `sk-or-v1-...`
 - Store: local `.env` / Cloud Run environment or secret; never commit
 
-### `DATABASE_URL`
+### `DATABASE_URL` and `DATABASE_URL_DIRECT`
 
-- Required: deployed persistence
+- Required: database-backed local/native or hosted persistence
 - Secret: yes
 - Cost: use Neon Free
-- Obtain: Neon project → Connect → pooled connection string
+- Obtain: Neon project → Connect → pooled connection string (`DATABASE_URL`) and direct migration URL (`DATABASE_URL_DIRECT`)
 - Format: `postgresql://user:password@ep-...-pooler.../neondb?sslmode=require`
-- Store: local `.env` / Cloud Run configuration; never commit
+- Store: local `.env` / future Cloud Run configuration; never commit
 
 ### `GCP_PROJECT_ID` and gcloud authentication
 
